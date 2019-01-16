@@ -1,10 +1,10 @@
 # Kubernetes Cluster Installation
-* Bu repoda bulunan install-k8s.sh dosyası, kubeadm aracılığıyla kubernetes clusterı kurulumu yapar.
-* Script master node'da çalıştırılır. Kurulum yapılacak olan node'ların erişim bilgileri servers.conf adlı dosyada belirtilir.
+* You can setup Kubernetes Cluster by running install_k8s.sh script which uses kubeadm
+* You should run this script on the master node, and write connection information of nodes on servers.conf
 
-#### Gereksinimler
-* Script root olarak çalıştırılmalı
-* Node'lara root üzerinden parola ile erişilmeli
-* Tüm makinelerde en az 2 CPU (core) bulunmalı
-* En az 2GB ram olmalı
-* Tüm makinelerin hostname'leri birbirlerinden farklı olmalı
+#### Requirements
+* Script must be run as root
+* Connection must contain root user with password authentication  
+* At least 2CPU per host
+* At least 2GB RAM per host
+* Hostnames of all hosts must be different from each other
