@@ -56,7 +56,25 @@ add-apt-repository \
    stable" &&
 
 apt-get update &&
-apt-get install -y docker-ce=18.06.0~ce~3-0~ubuntu &&
+apt-get install -y docker-ce=18.06.2~ce~3-0~ubuntu &&
+
+# Setup daemon.
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+
+mkdir -p /etc/systemd/system/docker.service.d
+
+# Restart docker.
+systemctl daemon-reload
+systemctl restart docker
 
 
 ########################### Installing Kubeadm Kubelet abd Kubectl ###########################
@@ -75,7 +93,11 @@ apt-mark hold kubelet kubeadm kubectl &&
 
 #Flannel will be used as network plugin
 
-JOIN_COMMAND="$(kubeadm init --pod-network-cidr=10.244.0.0/16 | grep 'kubeadm join')"
+kubeadm init --pod-network-cidr=10.244.0.0/16 
+
+JOIN_COMMAND=$(kubeadm token create --print-join-command)
+echo "#################JOIN COMMAND##############"
+echo $JOIN_COMMAND
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
 sysctl net.bridge.bridge-nf-call-iptables=1
@@ -103,6 +125,24 @@ while IFS=: read xx yy zz tt;do
    stable";
   apt-get update;
   apt-get install -y docker-ce=18.06.0~ce~3-0~ubuntu;
+  
+  # Setup daemon.
+  cat > /etc/docker/daemon.json <<EOF
+  {
+    "exec-opts": ["native.cgroupdriver=systemd"],
+    "log-driver": "json-file",
+    "log-opts": {
+      "max-size": "100m"
+    },
+    "storage-driver": "overlay2"
+  }
+  EOF
+  mkdir -p /etc/systemd/system/docker.service.d
+
+  # Restart docker.
+  systemctl daemon-reload
+  systemctl restart docker
+  
   swapoff -a
 
   apt-get update && apt-get install -y apt-transport-https curl;
